@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f8faff">
+  <meta name="description" content="BioMET ’26 conference contact details">
+  <title>Contact | BioMET ’26</title>
+  <link rel="icon" type="image/png" href="assets/icons/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="contact">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="app-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="BioMET home"><img src="assets/icons/logo.png" alt="BioMET ’26"></a>
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a href="index.html" data-nav="home">Live Updates</a>
+        <a href="schedule.html" data-nav="schedule">Schedule</a>
+        <a href="venue.html" data-nav="venue">Venue</a>
+        <a href="contact.html" data-nav="contact">Contact</a>
+      </nav>
+      <div class="header-tools">
+        <button class="icon-button theme-button" type="button" data-theme-toggle aria-label="Toggle colour theme"><i class="fa-solid fa-moon"></i></button>
+        <button class="icon-button menu-button" id="menuButton" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <button class="drawer-backdrop" id="drawerBackdrop" aria-label="Close menu"></button>
+    <div class="drawer-panel">
+      <div class="drawer-title"><strong>Conference menu</strong><button class="icon-button" id="drawerClose" type="button" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button></div>
+      <nav class="drawer-nav" aria-label="Mobile navigation">
+        <a href="index.html" data-nav="home"><i class="fa-solid fa-bell"></i>Live Updates</a>
+        <a href="schedule.html" data-nav="schedule"><i class="fa-solid fa-calendar-days"></i>Schedule</a>
+        <a href="venue.html" data-nav="venue"><i class="fa-solid fa-map-location-dot"></i>Venue</a>
+        <a href="contact.html" data-nav="contact"><i class="fa-solid fa-address-book"></i>Contact</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="container page-hero-inner">
+        <div>
+          <span class="page-kicker"><i class="fa-solid fa-headset"></i>Conference support</span>
+          <h1>Contact Details</h1>
+          <p>Contact the relevant organising team for abstracts, visa support, transport, accommodation or general assistance.</p>
+        </div>
+        <div class="hero-status">
+          <span>Primary conference email</span>
+          <strong id="primaryEmailHero">biomet2026@gmail.com</strong>
+          <small>For conference-wide enquiries</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-content">
+      <div class="container">
+        <div class="contact-overview-grid">
+          <article class="contact-overview-card contact-overview-primary">
+            <span class="contact-overview-icon"><i class="fa-solid fa-envelope"></i></span>
+            <div>
+              <span class="contact-overline">Primary contact</span>
+              <h2>Conference email</h2>
+              <a class="contact-overview-value" id="primaryEmailLink" href="mailto:biomet2026@gmail.com">biomet2026@gmail.com</a>
+              <p>Use this email for general conference communication and queries that do not fit a specific category below.</p>
+            </div>
+          </article>
+
+          <article class="contact-overview-card">
+            <span class="contact-overview-icon"><i class="fa-solid fa-share-nodes"></i></span>
+            <div>
+              <span class="contact-overline">Stay connected</span>
+              <h2>Official social updates</h2>
+              <p>Follow BioMET ’26 for conference announcements and highlights.</p>
+              <div class="social-contact-links">
+                <a id="linkedinLink" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i>LinkedIn</a>
+                <a id="instagramLink" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i>Instagram</a>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="section-heading contact-directory-heading">
+          <div>
+            <h2>Contact directory</h2>
+            <p>Choose the relevant category and contact the organising team directly.</p>
+          </div>
+        </div>
+
+        <div class="contact-groups" id="contactGroups"></div>
+
+        <section class="faq" aria-labelledby="faqHeading">
+          <div class="section-heading">
+            <div>
+              <h2 id="faqHeading">Frequently asked questions</h2>
+              <p>Quick guidance for using the programme, venue and contact pages during BioMET ’26.</p>
+            </div>
+          </div>
+          <div id="faqList"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div><strong data-conference-name>BioMET ’26</strong></div>
+      <div>© <span data-current-year></span> BioMET Conference</div>
+    </div>
+  </footer>
+
+  <nav class="app-dock" aria-label="Conference pages">
+    <a href="index.html" data-nav="home"><i class="fa-solid fa-bell"></i><span>Updates</span></a>
+    <a href="schedule.html" data-nav="schedule"><i class="fa-solid fa-calendar-days"></i><span>Schedule</span></a>
+    <a href="venue.html" data-nav="venue"><i class="fa-solid fa-map-location-dot"></i><span>Venue</span></a>
+    <a href="contact.html" data-nav="contact"><i class="fa-solid fa-address-book"></i><span>Contact</span></a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><i class="fa-solid fa-circle-info"></i><span id="toastText">Updated</span></div>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

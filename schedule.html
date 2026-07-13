@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f8faff">
+  <meta name="description" content="BioMET ’26 conference schedule">
+  <title>Schedule | BioMET ’26</title>
+
+  <link rel="icon" type="image/png" href="assets/icons/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body data-page="schedule">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="app-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="BioMET home">
+        <img src="assets/icons/logo.png" alt="BioMET ’26">
+      </a>
+
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a href="index.html" data-nav="home">Live Updates</a>
+        <a href="schedule.html" data-nav="schedule">Schedule</a>
+        <a href="venue.html" data-nav="venue">Venue</a>
+        <a href="contact.html" data-nav="contact">Contact</a>
+      </nav>
+
+      <div class="header-tools">
+        <button class="icon-button theme-button" type="button" data-theme-toggle aria-label="Toggle colour theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button class="icon-button menu-button" id="menuButton" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <button class="drawer-backdrop" id="drawerBackdrop" aria-label="Close menu"></button>
+    <div class="drawer-panel">
+      <div class="drawer-title">
+        <strong>Conference menu</strong>
+        <button class="icon-button" id="drawerClose" type="button" aria-label="Close menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <nav class="drawer-nav" aria-label="Mobile navigation">
+        <a href="index.html" data-nav="home"><i class="fa-solid fa-bell"></i>Live Updates</a>
+        <a href="schedule.html" data-nav="schedule"><i class="fa-solid fa-calendar-days"></i>Schedule</a>
+        <a href="venue.html" data-nav="venue"><i class="fa-solid fa-map-location-dot"></i>Venue</a>
+        <a href="contact.html" data-nav="contact"><i class="fa-solid fa-address-book"></i>Contact</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="container page-hero-inner">
+        <div>
+          <span class="page-kicker"><i class="fa-solid fa-calendar-days"></i>Conference programme</span>
+          <h1>Conference Schedule</h1>
+          <p>Browse the complete programme by date, search for speakers or events, and filter by scientific theme.</p>
+        </div>
+
+        <div class="hero-status">
+          <span>Programme dates</span>
+          <strong data-programme-dates>4–7 Aug 2026</strong>
+          <small data-last-updated>Schedule updated 12 July 2026</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-content">
+      <div class="container">
+        <aside class="programme-notice" aria-label="Programme notice">
+          <span class="programme-notice-icon"><i class="fa-solid fa-circle-info"></i></span>
+          <div>
+            <strong>Programme information</strong>
+            <p>The schedule below was added from the programme updated on 12 July 2026. Paper IDs, the three-minute-thesis venue and a few final details are still marked for later confirmation.</p>
+          </div>
+        </aside>
+
+        <div class="schedule-tools">
+          <label class="search-control">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span class="sr-only">Search sessions</span>
+            <input id="scheduleSearch" type="search" placeholder="Search speaker, event, room or scientific theme">
+          </label>
+
+          <label class="select-control">
+            <span class="sr-only">Filter by session or theme</span>
+            <select id="trackFilter">
+              <option value="all">All sessions and themes</option>
+            </select>
+            <i class="fa-solid fa-chevron-down"></i>
+          </label>
+        </div>
+
+        <div class="day-tabs" id="dayTabs" role="tablist" aria-label="Conference dates"></div>
+
+        <div class="schedule-summary-row">
+          <strong id="scheduleResultCount">Programme items</strong>
+          <span><i class="fa-solid fa-clock"></i> All times are in IST (GMT +05:30)</span>
+        </div>
+
+        <div class="schedule-list" id="scheduleList"></div>
+
+        <div class="empty-state" id="scheduleEmpty" hidden>
+          <i class="fa-regular fa-calendar-xmark"></i>
+          <h3>No sessions found</h3>
+          <p>Try another date, theme or search term.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <strong data-conference-name>BioMET ’26</strong>
+      </div>
+      <div>© <span data-current-year></span> BioMET Conference</div>
+    </div>
+  </footer>
+
+  <nav class="app-dock" aria-label="Conference pages">
+    <a href="index.html" data-nav="home"><i class="fa-solid fa-bell"></i><span>Updates</span></a>
+    <a href="schedule.html" data-nav="schedule"><i class="fa-solid fa-calendar-days"></i><span>Schedule</span></a>
+    <a href="venue.html" data-nav="venue"><i class="fa-solid fa-map-location-dot"></i><span>Venue</span></a>
+    <a href="contact.html" data-nav="contact"><i class="fa-solid fa-address-book"></i><span>Contact</span></a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <i class="fa-solid fa-circle-info"></i>
+    <span id="toastText">Updated</span>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
