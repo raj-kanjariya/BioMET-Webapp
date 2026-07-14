@@ -2348,6 +2348,10 @@ window.BIOMET_DATA = {
     {
       "question": "Is this website designed for mobile phones?",
       "answer": "Yes. It is designed primarily for mobile access and also works on tablets and desktop browsers. Use the bottom navigation to move quickly between pages."
+    },
+    {
+      "question": "Can I install the BioMET website on my phone or computer?",
+      "answer": "Yes. In Chrome, use the Install icon or the browser menu and choose Install app or Add to Home screen. On iPhone, open the website in Safari, tap Share, choose Add to Home Screen and tap Add."
     }
   ],
   "primaryContact": {

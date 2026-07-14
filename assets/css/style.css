@@ -1050,3 +1050,19 @@ html[data-theme="dark"] .contact-overview-icon {
     grid-template-columns: 1fr;
   }
 }
+
+/* Progressive Web App / installed-window refinements */
+.app-header {
+  padding-top: env(safe-area-inset-top);
+}
+
+@media (display-mode: standalone) {
+  body {
+    overscroll-behavior-y: contain;
+  }
+
+  .app-header {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}

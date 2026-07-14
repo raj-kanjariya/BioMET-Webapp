@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setActiveNav();
   initDrawer();
   initTheme();
+  initPWA();
 
   if (PAGE === "home") initHome();
   if (PAGE === "schedule") initSchedule();
@@ -431,6 +432,48 @@ function initContact() {
     `).join("");
   }
 }
+function initPWA() {
+  if (!("serviceWorker" in navigator)) return;
+
+  // Service workers require HTTPS in production. localhost is also accepted for testing.
+  if (location.protocol !== "https:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+    console.info("BioMET PWA: service worker registration requires HTTPS.");
+    return;
+  }
+
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register("./sw.js", { scope: "./" });
+      registration.update().catch(() => {});
+
+      registration.addEventListener("updatefound", () => {
+        const worker = registration.installing;
+        if (!worker) return;
+
+        worker.addEventListener("statechange", () => {
+          if (worker.state === "installed" && navigator.serviceWorker.controller) {
+            toast("A new BioMET website version is available. Reopen or refresh to update.");
+          }
+        });
+      });
+    } catch (error) {
+      console.warn("BioMET PWA service worker registration failed:", error);
+    }
+  });
+
+  window.addEventListener("appinstalled", () => {
+    toast("BioMET ’26 has been installed.");
+  });
+
+  window.addEventListener("offline", () => {
+    toast("You are offline. Previously loaded conference information is still available.");
+  });
+
+  window.addEventListener("online", () => {
+    toast("You are back online. Live conference information can now refresh.");
+  });
+}
+
 function optionalLink(element, url, message) {
   if (!element) return;
   if (url) {
