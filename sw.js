@@ -1,4 +1,4 @@
-const VERSION = "biomet-pwa-1.0.0";
+const VERSION = "biomet-pwa-2.2.0-auto-alerts-20260715";
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
@@ -45,7 +45,34 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+    return;
+  }
+
+  if (event.data?.type === "SHOW_NOTIFICATION" && event.data.notification) {
+    const notification = event.data.notification;
+    event.waitUntil(
+      self.registration.showNotification(notification.title, notification.options || {})
+    );
+  }
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = new URL(event.notification.data?.url || "./schedule.html", self.location.href).href;
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ("focus" in client) {
+          client.navigate(targetUrl).catch(() => {});
+          return client.focus();
+        }
+      }
+      return clients.openWindow ? clients.openWindow(targetUrl) : undefined;
+    })
+  );
 });
 
 self.addEventListener("fetch", (event) => {
@@ -55,7 +82,6 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (!url.protocol.startsWith("http")) return;
 
-  // Navigation and conference data use network-first so live changes are preferred.
   if (request.mode === "navigate") {
     event.respondWith(networkFirstPage(request));
     return;
@@ -66,10 +92,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // OpenStreetMap tiles should stay network-driven to avoid an unbounded cache.
   if (url.hostname.includes("tile.openstreetmap.org")) return;
-
-  // Local assets and the small set of external libraries/fonts are cached at runtime.
   event.respondWith(staleWhileRevalidate(request, RUNTIME_CACHE));
 });
 

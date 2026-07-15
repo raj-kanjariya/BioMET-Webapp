@@ -2,7 +2,7 @@
   "id": "./",
   "name": "BioMET ’26 Live Conference Information",
   "short_name": "BioMET ’26",
-  "description": "Live programme updates, speaker and event schedules, venue guidance and contact details for BioMET ’26 at VIT, Vellore.",
+  "description": "Live BioMET ’26 programme, five-minute talk reminders, venue guidance and conference contacts.",
   "lang": "en-IN",
   "dir": "ltr",
   "start_url": "./index.html",
@@ -80,5 +80,6 @@
         }
       ]
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }

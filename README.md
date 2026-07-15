@@ -1,85 +1,57 @@
-# BioMET ’26 Progressive Web App
+# BioMET ’26 Progressive Web App — 13 July Schedule
 
-This package converts the four-page BioMET live-information website into an installable Progressive Web App (PWA) while preserving the existing responsive website design.
+This package includes:
 
-## Pages
+- The complete programme from `Schedule_updated_13_07_2026_BP (1).xlsx`
+- 152 programme entries across 4–7 August 2026
+- Four-room parallel-session layouts
+- Home-page countdown to 5 August 2026, 7:30 AM IST
+- Browser-only one-click Install button
+- Five-minute reminders for talks and major programme sessions
+- Improved interface and PWA icons
+- Offline page and cached programme data
+- Responsive mobile, tablet and desktop layouts
 
-- `index.html` — Live Updates
-- `schedule.html` — Conference Schedule
-- `venue.html` — Venue Map
-- `contact.html` — Contact Directory and FAQs
-- `offline.html` — Offline fallback page
+## Installation
 
-## PWA files
+Deploy the website over HTTPS. Browser users will see an **Install** button in the header.
 
-- `manifest.json` — app name, icon, display mode and shortcuts
-- `sw.js` — service worker for installation and offline caching
-- `assets/icons/pwa-192.png` — standard install icon
-- `assets/icons/pwa-512.png` — large install icon
-- `assets/icons/pwa-maskable-512.png` — Android maskable icon
-- `assets/icons/apple-touch-icon.png` — iPhone/iPad home-screen icon
+- Chrome/Android: the button opens the native installation prompt when available.
+- iPhone/iPad: the button displays Safari’s Add to Home Screen steps.
+- The Install button is automatically hidden in the installed standalone PWA.
 
-## How the PWA behaves
+## Five-minute reminders
 
-- Chrome and compatible browsers can show an Install icon in the address bar.
-- Android Chrome can show **Install app** or **Add to Home screen**.
-- iPhone Safari can add the website through **Share → Add to Home Screen**.
-- Installed pages open in a standalone window without the normal browser interface.
-- The main pages, schedule, contacts, styling and conference data remain available after they have been cached.
-- HTML pages and `assets/js/data.js` use a network-first strategy so current live information is preferred whenever internet access is available.
-- OpenStreetMap map tiles still require internet access unless they were already loaded by the browser.
+Users must select **Enable 5-minute alerts** and allow notifications.
 
-## Required deployment condition
+Parallel talks beginning at the same time are grouped into one reminder to avoid four simultaneous notifications.
 
-The PWA must be hosted over **HTTPS**. Opening the HTML files directly using `file://` will not register the service worker and will not make the website installable.
+Important technical limitation: browser-only local reminders work while the website or installed PWA is running. Exact notifications after the app has been fully closed require a web-push server and stored push subscriptions, which are not included in this static website package.
 
-For local testing, `localhost` is accepted:
+## Testing locally
 
 ```bash
 python -m http.server 8000
 ```
 
-Then open:
+Open `http://localhost:8000`.
 
-```text
-http://localhost:8000
-```
+Chrome treats localhost as a secure context for PWA testing. Production deployment must use HTTPS.
 
-## Installation instructions
+## Main editable files
 
-### Google Chrome on desktop
+- `assets/js/data.js` — schedule, updates, contacts, FAQ and conference settings
+- `assets/js/app.js` — countdown, reminders, install flow and page behaviour
+- `assets/css/style.css` — responsive visual design
+- `sw.js` — offline caching and notification click behaviour
+- `manifest.json` — installation metadata
 
-1. Open the website.
-2. Look for the Install icon in the address bar.
-3. Click it and select **Install**.
 
-When the icon is not visible:
+## Automatic notification update
 
-1. Click the three-dot menu.
-2. Choose **Cast, save and share** or **Save and share**.
-3. Select **Install page as app** or **Create shortcut**.
-4. When available, enable **Open as window** and confirm.
-
-### Android using Chrome
-
-1. Open the website.
-2. Tap the three-dot menu.
-3. Tap **Add to Home screen** or **Install app**.
-4. Confirm.
-
-### iPhone using Safari
-
-1. Open the website in Safari.
-2. Tap the Share button.
-3. Select **Add to Home Screen**.
-4. Tap **Add**.
-
-## Updating the deployed PWA
-
-When changing website files, update the version near the top of `sw.js`:
-
-```js
-const VERSION = "biomet-pwa-1.0.1";
-```
-
-Changing this value creates a new cache and removes the previous cache after activation.
+- There is no notification enable/disable button.
+- On the user's first interaction, the browser automatically asks for notification permission.
+- Once permission is granted, five-minute talk reminders remain enabled.
+- A one-time welcome notification is shown after permission is granted.
+- Browser security does not allow a website to bypass or force notification permission.
+- The home countdown now ends at 5 August 2026, 12:00 AM IST and disappears after reaching zero.

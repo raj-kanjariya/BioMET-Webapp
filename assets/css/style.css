@@ -282,7 +282,7 @@ html[data-theme="dark"] .app-dock {
 
 
 /* ======================================================================
-   Detailed BioMET programme layout — updated from 12 July 2026 schedule
+   Detailed BioMET programme layout — updated from 13 July 2026 schedule
    ====================================================================== */
 
 .programme-notice {
@@ -1065,4 +1065,390 @@ html[data-theme="dark"] .contact-overview-icon {
     -webkit-user-select: none;
     user-select: none;
   }
+}
+
+
+/* ======================================================================
+   13 July 2026 PWA, countdown, notification and visual refinements
+   ====================================================================== */
+
+/* Larger and clearer interface icons */
+.metric-icon {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  border-radius: 17px;
+}
+.metric-icon i { font-size: 24px; }
+
+.update-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+}
+.update-icon i { font-size: 22px; }
+
+.programme-notice-icon,
+.contact-group-icon,
+.contact-overview-icon,
+.info-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+}
+.programme-notice-icon i,
+.contact-group-icon i,
+.contact-overview-icon i,
+.info-icon i { font-size: 22px; }
+
+.time-icon {
+  width: 48px;
+  height: 48px;
+}
+.time-icon i { font-size: 20px; }
+
+.person-avatar {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+}
+.person-avatar i { font-size: 16px; }
+
+.room-card > i {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 11px;
+  border-radius: 15px;
+  color: var(--navy);
+  background: rgba(0, 180, 216, .12);
+  font-size: 21px;
+}
+
+html[data-theme="dark"] .room-card > i {
+  color: var(--gold);
+  background: rgba(255, 209, 102, .12);
+}
+
+/* Browser-only one-click install control */
+.install-app-button {
+  min-height: 42px;
+  padding: 9px 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(13, 59, 102, .18);
+  border-radius: 12px;
+  color: var(--navy);
+  background: linear-gradient(135deg, rgba(255, 209, 102, .96), #ffe39a);
+  box-shadow: 0 8px 20px rgba(13, 59, 102, .10);
+  cursor: pointer;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.install-app-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(13, 59, 102, .16);
+}
+.install-app-button.install-ready::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-left: 1px;
+  border-radius: 50%;
+  background: #18a872;
+  box-shadow: 0 0 0 4px rgba(24, 168, 114, .13);
+}
+html[data-theme="dark"] .install-app-button {
+  color: var(--navy2);
+  border-color: rgba(255, 209, 102, .44);
+  background: linear-gradient(135deg, var(--gold), #ffe399);
+}
+
+/* Home countdown */
+.home-hero .page-hero-inner {
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 430px);
+}
+.conference-countdown {
+  min-width: 0;
+  padding: 21px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 22px;
+  background:
+    radial-gradient(340px 150px at 100% 0%, rgba(0, 180, 216, .18), transparent 72%),
+    rgba(255, 255, 255, .09);
+  box-shadow: 0 20px 52px rgba(0, 0, 0, .22);
+  backdrop-filter: blur(17px);
+}
+.countdown-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.countdown-heading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+}
+.countdown-heading > span i { color: var(--gold); }
+.countdown-heading small,
+.countdown-update {
+  color: rgba(255, 255, 255, .66);
+  font-size: 11px;
+}
+.countdown-grid {
+  margin: 16px 0 13px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.countdown-grid > div {
+  min-width: 0;
+  padding: 13px 6px 11px;
+  display: grid;
+  justify-items: center;
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .08);
+}
+.countdown-grid strong {
+  color: #fff;
+  font-size: clamp(23px, 3vw, 34px);
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.countdown-grid span {
+  margin-top: 7px;
+  color: rgba(255, 255, 255, .62);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.countdown-grid > div:last-child strong { color: var(--gold); }
+.countdown-update { display: block; }
+.countdown-live-message {
+  min-height: 105px;
+  margin: 16px 0 13px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 17px;
+  border-radius: 15px;
+  background: rgba(24, 168, 114, .17);
+  border: 1px solid rgba(72, 224, 170, .28);
+}
+.countdown-live-message > i {
+  color: #62e5af;
+  font-size: 30px;
+}
+.countdown-live-message strong,
+.countdown-live-message span { display: block; }
+.countdown-live-message span {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, .68);
+  font-size: 12px;
+}
+
+/* Talk notification controls */
+.hero-action-row {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.button-alert {
+  color: #fff;
+  border-color: rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .11);
+  box-shadow: none;
+}
+.button-alert:hover {
+  color: var(--navy2);
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.button-alert.is-enabled {
+  color: #052c20;
+  border-color: #63e3b2;
+  background: linear-gradient(135deg, #70e5b8, #a4f0d4);
+}
+.button-alert.is-blocked {
+  opacity: .68;
+  cursor: not-allowed;
+}
+.programme-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.programme-title-row h3 {
+  min-width: 0;
+  margin-right: auto;
+}
+.talk-alert-chip {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+/* Installation guidance modal */
+.install-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, visibility .2s ease;
+}
+.install-modal.open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+.install-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  background: rgba(2, 12, 24, .66);
+  backdrop-filter: blur(5px);
+}
+.install-modal-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(calc(100% - 28px), 470px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 27px;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  color: var(--text);
+  background: var(--card);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .32);
+}
+.install-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 11px;
+  color: var(--text);
+  background: var(--soft);
+  cursor: pointer;
+}
+.install-modal-icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 17px;
+  color: var(--navy);
+  background: rgba(255, 209, 102, .35);
+  font-size: 24px;
+}
+.install-modal-card h2 {
+  margin: 16px 0 6px;
+  font-size: 25px;
+}
+.install-modal-card p { color: var(--muted); }
+.install-modal-card ol {
+  margin: 17px 0 21px;
+  padding-left: 22px;
+  color: var(--muted);
+}
+.install-modal-card li { margin-bottom: 9px; }
+html[data-theme="dark"] .install-modal-card {
+  background:
+    radial-gradient(420px 200px at 100% 0%, rgba(0, 180, 216, .11), transparent 70%),
+    #092540;
+}
+html[data-theme="dark"] .install-modal-icon {
+  color: var(--gold);
+  background: rgba(255, 209, 102, .13);
+}
+html[data-theme="dark"] .install-modal-close { background: rgba(255,255,255,.08); }
+
+/* Keep native schedule dropdown readable in every dark browser. */
+html[data-theme="dark"] .select-control select {
+  color: #f7fbff !important;
+  background-color: transparent !important;
+  color-scheme: dark;
+}
+html[data-theme="dark"] .select-control select option,
+html[data-theme="dark"] .select-control select optgroup {
+  color: #f7fbff !important;
+  background: #082b4b !important;
+}
+
+/* Installed standalone window: installation control is never needed. */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .install-app-button { display: none !important; }
+}
+
+@media (max-width: 980px) {
+  .home-hero .page-hero-inner { grid-template-columns: 1fr; }
+  .conference-countdown { width: min(100%, 560px); }
+}
+
+@media (max-width: 720px) {
+  .install-app-button {
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0;
+    border-radius: 12px;
+  }
+  .install-app-button span { display: none; }
+  .install-app-button i { font-size: 17px; }
+
+  .metric-icon {
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
+  }
+  .metric-icon i { font-size: 22px; }
+
+  .conference-countdown { padding: 17px; }
+  .countdown-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .countdown-grid strong { font-size: 25px; }
+  .hero-action-row .button { width: auto; }
+  .button-alert { min-height: 43px; }
+
+  .programme-title-row { flex-direction: column; }
+  .talk-alert-chip { align-self: flex-start; }
+}
+
+@media (max-width: 390px) {
+  .brand img { width: 145px; }
+  .header-tools { gap: 5px; }
+  .countdown-grid { gap: 5px; }
+  .countdown-grid > div { padding-inline: 3px; }
+  .countdown-grid strong { font-size: 22px; }
+  .countdown-grid span { font-size: 8px; }
 }

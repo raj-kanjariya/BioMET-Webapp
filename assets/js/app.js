@@ -16,16 +16,24 @@ const TRACK_PALETTE = [
   "#047857", "#b45309", "#be123c", "#0369a1", "#4d7c0f"
 ];
 
+const ALERT_STORAGE_KEY = "biomet-talk-alerts-enabled";
+const WELCOME_NOTIFICATION_KEY = `biomet-welcome-notification-${DATA.conference.scheduleVersion || "latest"}`;
+const ALERT_SENT_KEY = `biomet-alerts-sent-${DATA.conference.scheduleVersion || "latest"}`;
+
 let activeDay = "";
 let selectedTrack = "all";
 let scheduleQuery = "";
 let mapInstance = null;
+let deferredInstallPrompt = null;
+let alertWatcher = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   populateShared();
   setActiveNav();
   initDrawer();
   initTheme();
+  initInstallButton();
+  initTalkNotifications();
   initPWA();
 
   if (PAGE === "home") initHome();
@@ -116,7 +124,6 @@ function applyTheme(theme) {
 
   const themeMeta = document.querySelector('meta[name="theme-color"]');
   if (themeMeta) themeMeta.setAttribute("content", theme === "dark" ? "#06233f" : "#f8faff");
-
   if (mapInstance) setTimeout(() => mapInstance.invalidateSize(), 80);
 }
 
@@ -125,6 +132,7 @@ function initHome() {
   setText("updateCount", DATA.updates.length);
   setText("scheduleCount", DATA.schedule.length);
   setText("conferenceDayCount", new Set(DATA.schedule.map((item) => item.day)).size);
+  initCountdown();
 
   document.getElementById("refreshUpdates")?.addEventListener("click", () => {
     const icon = document.querySelector("#refreshUpdates i");
@@ -135,6 +143,42 @@ function initHome() {
       toast("Live updates refreshed");
     }, 500);
   });
+}
+
+function initCountdown() {
+  const panel = document.getElementById("conferenceCountdown");
+  if (!panel || !DATA.conference.startAt) return;
+
+  setText("countdownStartLabel", DATA.conference.startLabel || "BioMET ’26");
+  const startTime = new Date(DATA.conference.startAt).getTime();
+
+  const tick = () => {
+    const remaining = startTime - Date.now();
+    const grid = document.getElementById("countdownGrid");
+
+    if (!Number.isFinite(startTime)) {
+      panel.hidden = true;
+      return;
+    }
+
+    if (remaining <= 0) {
+      panel.hidden = true;
+      return;
+    }
+
+    const days = Math.floor(remaining / 86400000);
+    const hours = Math.floor((remaining % 86400000) / 3600000);
+    const minutes = Math.floor((remaining % 3600000) / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+
+    setText("countdownDays", String(days).padStart(2, "0"));
+    setText("countdownHours", String(hours).padStart(2, "0"));
+    setText("countdownMinutes", String(minutes).padStart(2, "0"));
+    setText("countdownSeconds", String(seconds).padStart(2, "0"));
+    window.setTimeout(tick, 1000);
+  };
+
+  tick();
 }
 
 function renderUpdates() {
@@ -258,6 +302,9 @@ function renderSchedule() {
       const notes = session.notes
         ? `<div class="session-note">${esc(session.notes)}</div>`
         : "";
+      const alert = session.notify
+        ? `<span class="talk-alert-chip"><i class="fa-regular fa-bell"></i>5-min alert</span>`
+        : "";
 
       return `
         <article class="programme-card" style="--accent:${colour}">
@@ -265,7 +312,10 @@ function renderSchedule() {
             <span class="track-pill">${esc(session.track)}</span>
             <span class="programme-date">${esc(session.date)}</span>
           </div>
-          <h3>${esc(session.title)}</h3>
+          <div class="programme-title-row">
+            <h3>${esc(session.title)}</h3>
+            ${alert}
+          </div>
           ${session.description ? `<p>${esc(session.description)}</p>` : ""}
           <div class="session-details">
             ${speaker}
@@ -313,16 +363,10 @@ function initVenue() {
   setText("travelInfo", venue.travel);
   setText("accessibilityInfo", venue.accessibility);
 
-  optionalLink(
-    document.getElementById("directionsButton"),
-    venue.directionsUrl,
-    "Directions will be enabled after venue confirmation"
-  );
-  optionalLink(
-    document.getElementById("venueWebsiteButton"),
-    venue.websiteUrl,
-    "Venue website will be enabled after confirmation"
-  );
+  optionalLink(document.getElementById("directionsButton"), venue.directionsUrl,
+    "Directions will be enabled after venue confirmation");
+  optionalLink(document.getElementById("venueWebsiteButton"), venue.websiteUrl,
+    "Venue website will be enabled after confirmation");
 
   const roomGrid = document.getElementById("roomGrid");
   if (roomGrid) {
@@ -432,11 +476,337 @@ function initContact() {
     `).join("");
   }
 }
+
+/* ----------------------------------------------------------------------
+   Install button
+   ---------------------------------------------------------------------- */
+function isStandaloneMode() {
+  return window.matchMedia("(display-mode: standalone)").matches ||
+    window.matchMedia("(display-mode: fullscreen)").matches ||
+    navigator.standalone === true;
+}
+
+function initInstallButton() {
+  const tools = document.querySelector(".header-tools");
+  if (!tools || isStandaloneMode()) return;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.id = "installAppButton";
+  button.className = "install-app-button";
+  button.setAttribute("aria-label", "Install BioMET on this device");
+  button.innerHTML = '<i class="fa-solid fa-download"></i><span>Install</span>';
+  tools.insertBefore(button, tools.firstChild);
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    button.classList.add("install-ready");
+    button.title = "Install BioMET ’26";
+  });
+
+  button.addEventListener("click", async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      if (choice.outcome === "accepted") {
+        toast("Installing BioMET ’26…");
+      }
+      deferredInstallPrompt = null;
+      button.classList.remove("install-ready");
+      return;
+    }
+    showInstallGuide();
+  });
+
+  window.addEventListener("appinstalled", () => {
+    button.remove();
+    toast("BioMET ’26 has been installed.");
+  });
+
+  window.matchMedia("(display-mode: standalone)").addEventListener?.("change", (event) => {
+    if (event.matches) button.remove();
+  });
+}
+
+function showInstallGuide() {
+  const existing = document.getElementById("installGuideModal");
+  if (existing) {
+    existing.classList.add("open");
+    return;
+  }
+
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/i.test(ua);
+  const isAndroid = /Android/i.test(ua);
+  const isChrome = /Chrome|CriOS/i.test(ua) && !/Edg|OPR/i.test(ua);
+
+  let steps = `
+    <li>Open your browser menu.</li>
+    <li>Choose <strong>Install app</strong>, <strong>Install page as app</strong> or <strong>Add to Home screen</strong>.</li>
+    <li>Confirm the installation.</li>
+  `;
+
+  if (isIOS) {
+    steps = `
+      <li>Open this page in <strong>Safari</strong>.</li>
+      <li>Tap the <strong>Share</strong> button.</li>
+      <li>Select <strong>Add to Home Screen</strong>, then tap <strong>Add</strong>.</li>
+    `;
+  } else if (isAndroid && isChrome) {
+    steps = `
+      <li>Tap the Chrome <strong>⋮</strong> menu.</li>
+      <li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
+      <li>Confirm.</li>
+    `;
+  } else if (isChrome) {
+    steps = `
+      <li>Look for the Install icon in the address bar.</li>
+      <li>Or open <strong>⋮ → Cast, save and share → Install page as app</strong>.</li>
+      <li>Select <strong>Install</strong>.</li>
+    `;
+  }
+
+  const modal = document.createElement("div");
+  modal.className = "install-modal open";
+  modal.id = "installGuideModal";
+  modal.innerHTML = `
+    <button class="install-modal-backdrop" type="button" data-close-install aria-label="Close installation instructions"></button>
+    <section class="install-modal-card" role="dialog" aria-modal="true" aria-labelledby="installModalTitle">
+      <button class="install-modal-close" type="button" data-close-install aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      <span class="install-modal-icon"><i class="fa-solid fa-mobile-screen-button"></i></span>
+      <h2 id="installModalTitle">Install BioMET ’26</h2>
+      <p>Your browser has not exposed the direct installation prompt. Use these steps:</p>
+      <ol>${steps}</ol>
+      <button class="button button-primary button-block" type="button" data-close-install>Got it</button>
+    </section>
+  `;
+  document.body.appendChild(modal);
+
+  const close = () => modal.classList.remove("open");
+  modal.querySelectorAll("[data-close-install]").forEach((el) => el.addEventListener("click", close));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") close();
+  }, { once: true });
+}
+
+/* ----------------------------------------------------------------------
+   Five-minute talk notifications
+   ---------------------------------------------------------------------- */
+function initTalkNotifications() {
+  if (!("Notification" in window)) return;
+
+  if (Notification.permission === "granted") {
+    activateTalkNotifications();
+    return;
+  }
+
+  if (Notification.permission === "denied") {
+    localStorage.setItem(ALERT_STORAGE_KEY, "false");
+    return;
+  }
+
+  // Browsers require a real user gesture before showing the permission prompt.
+  // The first tap, click or keyboard interaction triggers it automatically.
+  const requestOnFirstInteraction = async () => {
+    removePermissionListeners();
+
+    let permission = Notification.permission;
+    if (permission === "default") {
+      try {
+        permission = await Notification.requestPermission();
+      } catch (error) {
+        console.warn("Notification permission request failed:", error);
+        return;
+      }
+    }
+
+    if (permission === "granted") {
+      activateTalkNotifications();
+      toast("Talk reminders are active.");
+    } else {
+      localStorage.setItem(ALERT_STORAGE_KEY, "false");
+      toast("Notifications are blocked. Enable them in your browser settings to receive reminders.");
+    }
+  };
+
+  const removePermissionListeners = () => {
+    document.removeEventListener("pointerdown", requestOnFirstInteraction, true);
+    document.removeEventListener("keydown", requestOnFirstInteraction, true);
+    document.removeEventListener("touchstart", requestOnFirstInteraction, true);
+  };
+
+  document.addEventListener("pointerdown", requestOnFirstInteraction, { once: true, capture: true });
+  document.addEventListener("keydown", requestOnFirstInteraction, { once: true, capture: true });
+  document.addEventListener("touchstart", requestOnFirstInteraction, { once: true, capture: true });
+}
+
+function activateTalkNotifications() {
+  if (Notification.permission !== "granted") return;
+
+  localStorage.setItem(ALERT_STORAGE_KEY, "true");
+  showWelcomeNotificationOnce();
+  startAlertWatcherIfEnabled();
+}
+
+async function showWelcomeNotificationOnce() {
+  if (localStorage.getItem(WELCOME_NOTIFICATION_KEY) === "true") return;
+
+  const title = "Welcome to BioMET ’26";
+  const options = {
+    body: "Stay updated with upcoming talks, programme changes, venues and important conference information.",
+    icon: "./assets/icons/pwa-192.png",
+    badge: "./assets/icons/favicon-64.png",
+    tag: "biomet-welcome",
+    renotify: false,
+    data: { url: "./index.html" }
+  };
+
+  try {
+    if ("serviceWorker" in navigator) {
+      const registration = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise((resolve) => setTimeout(() => resolve(null), 1500))
+      ]);
+
+      if (registration) {
+        await registration.showNotification(title, options);
+        localStorage.setItem(WELCOME_NOTIFICATION_KEY, "true");
+        return;
+      }
+    }
+
+    new Notification(title, options);
+    localStorage.setItem(WELCOME_NOTIFICATION_KEY, "true");
+  } catch (error) {
+    console.warn("Welcome notification could not be shown:", error);
+  }
+}
+
+function startAlertWatcherIfEnabled() {
+  if (!("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+
+  localStorage.setItem(ALERT_STORAGE_KEY, "true");
+  stopAlertWatcher();
+  checkTalkAlerts();
+  alertWatcher = window.setInterval(checkTalkAlerts, 20000);
+}
+
+function stopAlertWatcher() {
+  if (alertWatcher) {
+    clearInterval(alertWatcher);
+    alertWatcher = null;
+  }
+}
+
+function buildAlertGroups() {
+  const groups = new Map();
+
+  DATA.schedule
+    .filter((event) => event.notify && event.startAt)
+    .forEach((event) => {
+      if (!groups.has(event.startAt)) groups.set(event.startAt, []);
+      groups.get(event.startAt).push(event);
+    });
+
+  return [...groups.entries()]
+    .map(([startAt, events]) => ({ startAt, events }))
+    .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+}
+
+async function checkTalkAlerts() {
+  if (Notification.permission !== "granted") return;
+
+  const now = Date.now();
+  const leadMs = (DATA.conference.alertLeadMinutes || 5) * 60000;
+  const sent = readSentAlerts();
+
+  for (const group of buildAlertGroups()) {
+    const start = new Date(group.startAt).getTime();
+    const remaining = start - now;
+    const key = group.startAt;
+
+    // A 75-second grace range avoids missed reminders when a background timer is throttled.
+    if (remaining > 0 && remaining <= leadMs && !sent[key]) {
+      await showTalkNotification(group);
+      sent[key] = Date.now();
+      localStorage.setItem(ALERT_SENT_KEY, JSON.stringify(sent));
+    }
+  }
+}
+
+function readSentAlerts() {
+  try {
+    return JSON.parse(localStorage.getItem(ALERT_SENT_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+async function showTalkNotification(group) {
+  const events = group.events;
+  const time = events[0]?.start || "";
+  const uniqueTracks = [...new Set(events.map((event) => event.track))];
+  const uniqueRooms = [...new Set(events.map((event) => event.room).filter(Boolean))];
+
+  let title;
+  let body;
+
+  if (events.length === 1) {
+    const event = events[0];
+    title = `${event.title} starts in 5 minutes`;
+    const speaker = event.speaker ? compactSpeaker(event.speaker) : event.track;
+    body = [speaker, event.room].filter(Boolean).join(" · ");
+  } else {
+    title = `${events.length} parallel talks start in 5 minutes`;
+    const trackText = uniqueTracks.slice(0, 3).join(", ");
+    const more = uniqueTracks.length > 3 ? ` +${uniqueTracks.length - 3} more` : "";
+    body = `${time} · ${trackText}${more}`;
+    if (uniqueRooms.length === 1) body += ` · ${uniqueRooms[0]}`;
+  }
+
+  const options = {
+    body,
+    icon: "./assets/icons/pwa-192.png",
+    badge: "./assets/icons/favicon-64.png",
+    tag: `biomet-${group.startAt}`,
+    renotify: false,
+    timestamp: new Date(group.startAt).getTime(),
+    data: { url: "./schedule.html" }
+  };
+
+  try {
+    if ("serviceWorker" in navigator) {
+      const registration = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise((resolve) => setTimeout(() => resolve(null), 1200))
+      ]);
+      if (registration) {
+        await registration.showNotification(title, options);
+        return;
+      }
+    }
+  } catch (error) {
+    console.warn("Service-worker notification unavailable:", error);
+  }
+
+  new Notification(title, options);
+}
+
+function compactSpeaker(value) {
+  return String(value).split(" — ")[0].trim();
+}
+
+/* ----------------------------------------------------------------------
+   Service worker and connectivity
+   ---------------------------------------------------------------------- */
 function initPWA() {
   if (!("serviceWorker" in navigator)) return;
 
-  // Service workers require HTTPS in production. localhost is also accepted for testing.
-  if (location.protocol !== "https:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+  if (location.protocol !== "https:" &&
+      location.hostname !== "localhost" &&
+      location.hostname !== "127.0.0.1") {
     console.info("BioMET PWA: service worker registration requires HTTPS.");
     return;
   }
@@ -452,17 +822,13 @@ function initPWA() {
 
         worker.addEventListener("statechange", () => {
           if (worker.state === "installed" && navigator.serviceWorker.controller) {
-            toast("A new BioMET website version is available. Reopen or refresh to update.");
+            toast("A new BioMET version is available. Refresh to update.");
           }
         });
       });
     } catch (error) {
       console.warn("BioMET PWA service worker registration failed:", error);
     }
-  });
-
-  window.addEventListener("appinstalled", () => {
-    toast("BioMET ’26 has been installed.");
   });
 
   window.addEventListener("offline", () => {
@@ -496,7 +862,7 @@ function toast(message) {
   text.textContent = message;
   element.classList.add("show");
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => element.classList.remove("show"), 2500);
+  toast.timer = setTimeout(() => element.classList.remove("show"), 3000);
 }
 
 function setText(id, value) {
